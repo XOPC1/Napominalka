@@ -1,0 +1,119 @@
+Скоринов Никита Сергеевич
+15. Опишите разницу между статическими и нестатическими методами класса. Приведите примеры.
+21. Расскажите об интерфейсе MDI. Приведите примеры.
+41. Написать приложение, позволяющее напомнить о событии через заданное время.
+ Предусмотреть возможность случайного закрытия сл. образом: введённая пользователем информация не должна потеряться.
+ Также должен быть инструмент удаления напоминания, если оно неактуально для пользователя.
+
+###1
+
+Статические методы - это методы, связанные с классом, тогда как нестатические методы - это методы, 
+которые связаны с объектами класса. Чтобы вызвать нестатический метод, сначала необходимо создать экземпляр класса, 
+но для статических методов это требование отсутствует. Их можно просто вызвать, используя имя класса, содержащего статический метод.
+
+чтобы вызвать нестатический метод класса, нужно создать экземпляр (объект) этого класса. 
+Статический метод вызывается без создания объекта класса – перед именем метода указывается имя класса, 
+в котором этот статический метод объявлен.
+
+// нестатический класс, который содержит нестатический и статический методы
+class Sqr
+{
+  // нестатический метод
+  public int GetSqr(int x)
+  {
+    return x * x;
+  }
+
+  // статический метод
+  public static int GetSqrStatic(int x)
+  {
+    return x * x;
+  }
+}
+
+------------------------------------
+
+// Демонстрация вызова статического и нестатического методов класса
+int t;
+
+// 1. Вызов нестатического метода класса Sqr
+// Нужно создать объект класса
+Sqr sc = new Sqr();
+t = sc.GetSqr(7); // t = 49
+
+// 2. Вызов статического метода класса Sqr
+t = Sqr.GetSqrStatic(7); // t = 49
+
+###2
+
+Приложения с многодокументным интерфейсом (MDI) позволяют отображать несколько документов одновременно, 
+при этом каждый документ отображается в отдельном окне. Приложения MDI часто имеют пункт меню "окно" 
+с подменю для переключения между окнами или документами.
+
+Существуют различия в поведении между формами MDI и окнами однодокументного интерфейса (SDI) в Windows Forms. 
+Свойство Opacity не влияет на внешний вид дочерних форм MDI. 
+Кроме того, метод CenterToParent не влияет на поведение дочерних форм MDI.
+
+using System;
+using System.ComponentModel;
+using System.WinForms;
+using System.Drawing;
+public class MDI :Form
+{
+private MainMenu mainMenu;
+private int Count=0;
+public MDI()
+{
+this.IsMDIContainer=true;
+this.Text="MDI Demo";
+mainMenu = new MainMenu();
+MenuItem File = mainMenu.MenuItems.Add("&File");
+File.MenuItems.Add(new MenuItem("&New",new EventHandler this.FileNew_clicked),Shortcut.CtrlN));
+File.MenuItems.Add(new MenuItem("&Active Child",new EventHandler this.FindActive_clicked),Shortcut.CtrlA));
+File.MenuItems.Add(new MenuItem("-"));
+File.MenuItems.Add(new MenuItem("&Exit",new EventHandler this.FileExit_clicked),Shortcut.CtrlX));
+MenuItem Arrange = mainMenu.MenuItems.Add("&Arrange");
+Arrange.MenuItems.Add(new MenuItem("&Cascade",new EventHandler this.Cascade_clicked),Shortcut.F1));
+Arrange.MenuItems.Add(new MenuItem("&Horizontal",new EventHandler this.Horizontal_clicked),Shortcut.F2));
+Arrange.MenuItems.Add(new MenuItem("&Vertical",new EventHandler this.Vertical_clicked),Shortcut.F3));
+this.Menu=mainMenu;
+mainMenu.GetForm().BackColor = Color.Indigo ;
+}
+private void FileExit_clicked(object sender, EventArgs e)
+{
+this.Close();
+}
+private void FindActive_clicked(object sender, EventArgs e)
+{
+MessageBox.Show(this.ActiveMDIChild.Text,"MDI FORM",MessageBox.IconInformation);
+}
+private void FileNew_clicked(object sender, EventArgs e)
+{
+Form frmchild=new Form();
+frmchild.MDIParent=this;
+frmchild.Show();
+frmchild.Text="Child Form" + Count.ToString();
+Count++;
+}
+private void pop_Clicked(object sender, EventArgs e)
+{
+MessageBox.Show("Popupmenu","MENU_CREATION",MessageBox.IconInformation);
+}
+private void Cascade_clicked(object sender, EventArgs e)
+{
+this.LayoutMDI(MDILayout.Cascade );
+}
+private void Horizontal_clicked(object sender, EventArgs e)
+{
+this.LayoutMDI(MDILayout.TileHorizontal);
+}
+private void Vertical_clicked(object sender, EventArgs e)
+{
+this.LayoutMDI(MDILayout.TileVertical);
+}
+public static void Main(string[] args)
+{
+Application.Run(new MDI());
+}
+}
+
